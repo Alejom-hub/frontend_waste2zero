@@ -1,0 +1,23 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "Flutter Web (Chrome)",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": ["run", "-d", "chrome", "--web-port=8080"],
+      "port": 8080
+    },
+    {
+      "name": "Flutter Android (Emulator Waste2Zero_Pixel6)",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": ["run", "-d", "emulator-5554"],
+      "port": 0
+    },
+    {
+      "name": "Flutter Android (Samsung S23 fisico)",
+      "runtimeExecutable": "flutter",
+      "runtimeArgs": ["run", "-d", "adb-R3CW50KVD3L-vxvteP._adb-tls-connect._tcp"],
+      "port": 0
+    }
+  ]
+}
