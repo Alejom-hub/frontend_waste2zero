@@ -41,22 +41,30 @@ class _LoginScreenState extends State<LoginScreen> {
         children: [
           // ── Zona blanca superior con logo ──
           Expanded(
-            flex: 2,
+            flex: 2, // Reducido para que la tarjeta verde suba
             child: SafeArea(
               bottom: false,
               child: Center(
                 child: Container(
-                  width: 80,
-                  height: 80,
-                  // TODO: reemplazar con Image.asset('assets/images/logo_waste2zero.png')
+                  width: 140, // Logo grande
+                  height: 140,
                   decoration: BoxDecoration(
                     color: AppColors.lightGreen,
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(24),
                   ),
-                  child: const Icon(
-                    Icons.shopping_basket_rounded,
-                    color: AppColors.primaryGreen,
-                    size: 44,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: Image.asset(
+                      'assets/images/greenlogo.png',
+                      fit: BoxFit.contain,
+                      errorBuilder: (context, error, stackTrace) {
+                        return const Icon(
+                          Icons.shopping_basket_rounded,
+                          color: AppColors.primaryGreen,
+                          size: 80,
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
@@ -134,12 +142,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             // TODO: pantalla de recuperar contraseña
                           },
-                          child: const Text(
+                          child: Text(
                             '¿Olvidaste tu contraseña?',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: Colors.blue[900],
                               fontSize: 13,
-                              fontWeight: FontWeight.w500,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -236,14 +244,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             },
-                            child: const Text(
+                            child: Text(
                               'Registrarse',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: Colors.blue[900],
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                                decorationColor: Colors.white,
                               ),
                             ),
                           ),
