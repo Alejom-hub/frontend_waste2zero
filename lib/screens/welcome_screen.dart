@@ -54,7 +54,7 @@ class WelcomeScreen extends StatelessWidget {
                           MaterialPageRoute(builder: (_) => const RegisterScreen()),
                         );
                       },
-                      backgroundColor: Colors.white.withOpacity(0.3),
+                      backgroundColor: Colors.white.withValues(alpha: 0.3),
                       textColor: Colors.white,
                     ),
 

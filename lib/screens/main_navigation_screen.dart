@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/bottom_nav_bar.dart';
+import 'scanned_products_screen.dart';
 import 'home_screen.dart';
 import 'tips_screen.dart';
 import 'notifications_screen.dart';
@@ -15,25 +16,36 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   // Comenzamos en la pestaña central (índice 2 = escáner / carrito)
   int _currentIndex = 2;
 
-  // Índice 0: Inicio general (placeholder)
+  // Índice 0: Mis Productos (ScannedProductsScreen)
   // Índice 1: Escáner QR (placeholder)
-  // Índice 2: Escáner de factura (home_screen)
-  // Índice 3: Notificaciones
-  // Índice 4: Tips y donaciones
-  late final List<Widget> _screens = [
-    _PlaceholderScreen(label: 'Inicio', icon: Icons.home_rounded),
-    _PlaceholderScreen(label: 'Escáner', icon: Icons.crop_free_rounded),
-    const HomeScreen(),
-    const NotificationsScreen(),
-    const TipsScreen(),
-  ];
+  // Índice 2: Escáner de factura (HomeScreen)
+  // Índice 3: Notificaciones (NotificationsScreen)
+  // Índice 4: Tips y donaciones (TipsScreen)
+  //
+  // NOTA: la lista se construye en build() y NO como late final para que
+  // ScannedProductsScreen y NotificationsScreen (StatelessWidgets) se
+  // reconstruyan y lean el ProductStore actualizado cada vez que se cambia
+  // de pestaña. HomeScreen es StatefulWidget: Flutter preserva su estado
+  // aunque la lista se recree en cada build.
 
   @override
   Widget build(BuildContext context) {
+    // ScannedProductsScreen y NotificationsScreen NO llevan const:
+    // sin const Flutter crea una nueva instancia en cada build() y fuerza
+    // el rebuild del StatelessWidget, lo que hace que lean el ProductStore
+    // actualizado cada vez que el usuario cambia de pestaña.
+    final screens = [
+      ScannedProductsScreen(),
+      _PlaceholderScreen(label: 'Escáner QR', icon: Icons.crop_free_rounded),
+      const HomeScreen(),
+      NotificationsScreen(),
+      const TipsScreen(),
+    ];
+
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: screens,
       ),
       bottomNavigationBar: BottomNavBar(
         currentIndex: _currentIndex,

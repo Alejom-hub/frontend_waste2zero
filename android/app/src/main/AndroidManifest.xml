@@ -1,4 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Red: obligatorio para llamadas HTTP/HTTPS en todos los modos de build -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Permisos de cámara y almacenamiento para escanear facturas -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
     <application
         android:label="frontend_waste2zero"
         android:name="${applicationName}"

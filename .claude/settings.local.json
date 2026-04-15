@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(flutter --version)"
+      "Bash(flutter --version)",
+      "WebFetch(domain:w2z.matwa.is-cool.dev)",
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(reg query:*)",
+      "Bash(powershell -ExecutionPolicy Bypass -Command ':*)",
+      "Bash(flutter build:*)",
+      "Bash(flutter run:*)"
     ]
   }
 }

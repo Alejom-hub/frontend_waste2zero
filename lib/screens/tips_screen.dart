@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../widgets/user_avatar_menu.dart';
 
 class TipsScreen extends StatelessWidget {
   const TipsScreen({super.key});
@@ -23,7 +24,7 @@ class TipsScreen extends StatelessWidget {
                       // TODO: abrir drawer/menú lateral
                     },
                   ),
-                  _UserAvatar(),
+                  const UserAvatarMenu(),
                 ],
               ),
             ),
@@ -122,13 +123,6 @@ class TipsScreen extends StatelessWidget {
                                       color: AppColors.textDark,
                                     ),
                                     children: [
-                                      TextSpan(
-                                        text: '¡Lily! ',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: AppColors.textGreen,
-                                        ),
-                                      ),
                                       TextSpan(
                                         text:
                                             'Si tienes un alimento próximo a vencer o que no quieras desperdiciar ',
@@ -326,18 +320,3 @@ class _GreenIconButton extends StatelessWidget {
   }
 }
 
-// ── Avatar de usuario ──
-class _UserAvatar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 40,
-      height: 40,
-      decoration: const BoxDecoration(
-        color: Color(0xFF9C75BC),
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(Icons.person_rounded, color: Colors.white, size: 26),
-    );
-  }
-}

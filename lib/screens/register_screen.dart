@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
+import '../services/auth_service.dart';
+import '../utils/app_session.dart';
 import 'main_navigation_screen.dart';
 import 'login_screen.dart';
 
@@ -19,6 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _confirmPasswordController = TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -30,14 +33,54 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _onRegister() {
-    if (_formKey.currentState?.validate() ?? false) {
-      // TODO: conectar con API de registro
+  Future<void> _onRegister() async {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() => _isLoading = true);
+
+    // La API recibe "name" como nombre completo
+    final fullName =
+        '${_nameController.text.trim()} ${_lastNameController.text.trim()}';
+
+    try {
+      final response = await AuthService.instance.register(
+        name: fullName,
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
+      );
+
+      // Guardar sesión en memoria
+      AppSession.instance.save(
+        token: response.accessToken,
+        user: response.user,
+      );
+
+      if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
         (_) => false,
       );
+    } on AuthException catch (e) {
+      if (!mounted) return;
+      _showError(e.message);
+    } catch (_) {
+      if (!mounted) return;
+      _showError('Ocurrió un error inesperado. Intenta de nuevo.');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: Colors.red.shade700,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
   }
 
   @override
@@ -193,22 +236,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           width: double.infinity,
                           height: 54,
                           child: ElevatedButton(
-                            onPressed: _onRegister,
+                            onPressed: _isLoading ? null : _onRegister,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
                               foregroundColor: Colors.white,
+                              disabledBackgroundColor: Colors.black54,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(32),
                               ),
                             ),
-                            child: const Text(
-                              'Registrarse',
-                              style: TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    width: 22,
+                                    height: 22,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2.5,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Registrarse',
+                                    style: TextStyle(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                           ),
                         ),
                       ),

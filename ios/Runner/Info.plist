@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<!-- Permisos para escanear facturas -->
+	<key>NSCameraUsageDescription</key>
+	<string>Necesitamos acceso a la cámara para fotografiar tu factura de mercado</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Necesitamos acceso a tus fotos para seleccionar tu factura de mercado</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Necesitamos guardar la foto de tu factura</string>
+
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
