@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../utils/app_session.dart';
+import '../utils/product_store.dart';
+import '../utils/chat_store.dart';
 import '../screens/welcome_screen.dart';
 
 class UserAvatarMenu extends StatelessWidget {
@@ -107,10 +109,12 @@ class UserAvatarMenu extends StatelessWidget {
   }
 
   void _logout(BuildContext context) {
-    // Limpiar sesión
+    // Limpiar sesión y memoria (el disco se conserva para el próximo login)
+    ProductStore.instance.clear();
+    ChatStore.instance.clear();
     AppSession.instance.clear();
 
-    // Volver a la pantalla de bienvenida, eliminar todo el historial
+    // Volver a la pantalla de bienvenida
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const WelcomeScreen()),
       (_) => false,

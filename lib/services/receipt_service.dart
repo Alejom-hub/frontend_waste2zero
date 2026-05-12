@@ -19,19 +19,45 @@ class ReceiptService {
   static const String _baseUrl = 'https://w2z.matwa.is-cool.dev';
   static const Duration _timeout = Duration(seconds: 120);
 
-  /// POST /api/receipt/analyze  — multipart/form-data, campo: "file"
+  /// POST /api/receipt/analyze — multipart/form-data, campo: "file"
+  /// Reintenta una vez automáticamente si el servidor responde "overloaded".
   Future<ReceiptResponse> analyzeReceipt(File imageFile) async {
+    ReceiptException? lastError;
+
+    for (int attempt = 0; attempt < 2; attempt++) {
+      // Pausa de 4 segundos antes del segundo intento
+      if (attempt > 0) {
+        await Future.delayed(const Duration(seconds: 4));
+      }
+
+      try {
+        return await _sendRequest(imageFile);
+      } on ReceiptException catch (e) {
+        lastError = e;
+        // Reintenta en sobrecarga (503/529) y errores internos transitorios (500)
+        final lower = e.message.toLowerCase();
+        final isRetryable = lower.contains('overload') ||
+            lower.contains('sobrecarg') ||
+            lower.contains('500') ||
+            lower.contains('503') ||
+            lower.contains('529');
+        if (!isRetryable) rethrow;
+      }
+    }
+
+    throw lastError!;
+  }
+
+  /// Envío real al API — no modificar el formato de la petición.
+  Future<ReceiptResponse> _sendRequest(File imageFile) async {
     final uri = Uri.parse('$_baseUrl/api/receipt/analyze');
     final request = http.MultipartRequest('POST', uri);
 
-    // Token de autenticación (si existe)
     final token = AppSession.instance.token;
     if (token != null) {
       request.headers['Authorization'] = 'Bearer $token';
     }
 
-    // Adjuntar el archivo tal cual, sin forzar content-type
-    // (igual que hace curl con -F "file=@imagen.jpg")
     request.files.add(
       await http.MultipartFile.fromPath('file', imageFile.path),
     );
@@ -58,10 +84,10 @@ class ReceiptService {
       );
     }
 
-    // ── Leer respuesta ───────────────────────────────────────────────────────
+    // ── Leer y parsear respuesta ─────────────────────────────────────────────
     final responseBody = await streamed.stream.bytesToString();
 
-    Map<String, dynamic> body;
+    late Map<String, dynamic> body;
     try {
       body = jsonDecode(responseBody) as Map<String, dynamic>;
     } catch (_) {
@@ -74,7 +100,6 @@ class ReceiptService {
       return ReceiptResponse.fromJson(body);
     }
 
-    // Cualquier error HTTP (401, 422, 500, …)
     final msg = body['detail']?.toString() ??
         body['message']?.toString() ??
         body['error']?.toString() ??

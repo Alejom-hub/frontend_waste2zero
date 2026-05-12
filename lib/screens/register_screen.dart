@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../services/auth_service.dart';
 import '../utils/app_session.dart';
+import '../utils/product_store.dart';
+import '../utils/chat_store.dart';
+import '../services/notification_service.dart';
 import 'main_navigation_screen.dart';
 import 'login_screen.dart';
 
@@ -54,6 +57,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
         token: response.accessToken,
         user: response.user,
       );
+
+      // Nueva cuenta: inicializar historial vacío para este usuario
+      await Future.wait([
+        ProductStore.instance.loadForUser(response.user.id),
+        ChatStore.instance.loadForUser(response.user.id),
+      ]);
+
+      // Nueva cuenta no tendrá productos aún, pero llamamos igual para consistencia
+      NotificationService.instance
+          .rescheduleAll(ProductStore.instance.allProductsWithScanDate)
+          .ignore();
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(

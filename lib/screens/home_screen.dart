@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import '../theme/app_colors.dart';
 import '../utils/app_session.dart';
 import '../services/receipt_service.dart';
+import '../services/notification_service.dart';
 import '../utils/product_store.dart';
 import '../widgets/user_avatar_menu.dart';
 import 'receipt_result_screen.dart';
@@ -50,8 +51,22 @@ class _HomeScreenState extends State<HomeScreen> {
       final result =
           await ReceiptService.instance.analyzeReceipt(_selectedImage!);
 
-      // Guardar en el store para el historial y notificaciones
-      ProductStore.instance.addReceipt(result);
+      // Guardar en el store — falla silenciosamente para no bloquear
+      // la pantalla de resultados si algo interno falla
+      final scannedAt = DateTime.now();
+      try {
+        ProductStore.instance.addReceipt(result);
+      } catch (_) {}
+
+      // ── Notificaciones ──────────────────────────────────────────────────
+      // 1. Inmediata: el usuario sabe que el escaneo terminó
+      NotificationService.instance
+          .notifyScanComplete(result.totalItems)
+          .ignore();
+      // 2. Programadas: alerta cuando cada producto esté próximo a vencer
+      NotificationService.instance
+          .scheduleExpiryNotifications(result.products, scannedAt)
+          .ignore();
 
       if (!mounted) return;
       // Navegar a la pantalla de resultados
@@ -65,9 +80,9 @@ class _HomeScreenState extends State<HomeScreen> {
     } on ReceiptException catch (e) {
       if (!mounted) return;
       _showError(e.message);
-    } catch (_) {
+    } catch (e) {
       if (!mounted) return;
-      _showError('Ocurrió un error inesperado. Intenta de nuevo.');
+      _showError('Error: ${e.toString()}');
     } finally {
       if (mounted) setState(() => _isAnalyzing = false);
     }
@@ -413,7 +428,7 @@ class _AnalyzingView extends StatelessWidget {
           ),
           SizedBox(height: 8),
           Text(
-            'Esto puede tardar unos segundos',
+            'Esto puede tardar hasta 1 minuto',
             style: TextStyle(fontSize: 13, color: AppColors.textGrey),
           ),
         ],

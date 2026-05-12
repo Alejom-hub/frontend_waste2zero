@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../services/auth_service.dart';
 import '../utils/app_session.dart';
+import '../utils/product_store.dart';
+import '../utils/chat_store.dart';
+import '../services/notification_service.dart';
 import 'main_navigation_screen.dart';
 import 'register_screen.dart';
 
@@ -42,6 +45,17 @@ class _LoginScreenState extends State<LoginScreen> {
         token: response.accessToken,
         user: response.user,
       );
+
+      // Cargar historial de facturas y chat guardados para este usuario
+      await Future.wait([
+        ProductStore.instance.loadForUser(response.user.id),
+        ChatStore.instance.loadForUser(response.user.id),
+      ]);
+
+      // Reprogramar notificaciones de vencimiento para productos guardados
+      NotificationService.instance
+          .rescheduleAll(ProductStore.instance.allProductsWithScanDate)
+          .ignore();
 
       if (!mounted) return;
       Navigator.of(context).pushAndRemoveUntil(

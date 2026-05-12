@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../widgets/user_avatar_menu.dart';
+import 'chat_screen.dart';
 
 class TipsScreen extends StatelessWidget {
   const TipsScreen({super.key});
@@ -50,35 +51,88 @@ class TipsScreen extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    // ── Dos columnas: Orgánicos e Industriales ──
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _FoodTipCard(
-                            title: 'Organicos',
-                            tipText:
-                                'Para conservar las fresas frescas por más tiempo...',
-                            // TODO: reemplaza con Image.asset('assets/images/fresas.jpg')
-                            imagePlaceholderColor: const Color(0xFFFFCDD2),
-                            imagePlaceholderIcon: Icons.local_florist_rounded,
+                    // ── Tarjeta del chatbot ──────────────────────────────────
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (_) => const ChatScreen()),
+                      ),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [
+                              AppColors.primaryGreen,
+                              AppColors.darkGreen,
+                            ],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
                           ),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.primaryGreen
+                                  .withValues(alpha: 0.35),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _FoodTipCard(
-                            title: 'Industriales',
-                            tipText:
-                                'Para conservar el arroz crudo, guárdalo en...',
-                            // TODO: reemplaza con Image.asset('assets/images/arroz.jpg')
-                            imagePlaceholderColor: const Color(0xFFFFF9C4),
-                            imagePlaceholderIcon: Icons.inventory_2_rounded,
-                          ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 56, height: 56,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.15),
+                                shape: BoxShape.circle,
+                              ),
+                              clipBehavior: Clip.antiAlias,
+                              child: Image.asset(
+                                'assets/images/Greenie.png',
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            const Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Habla con Greenie 🌱',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    'Consejos personalizados según tus productos escaneados',
+                                    style: TextStyle(
+                                      color: Colors.white70,
+                                      fontSize: 12,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Container(
+                              width: 32, height: 32,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withValues(alpha: 0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(Icons.arrow_forward_rounded,
+                                  color: Colors.white, size: 18),
+                            ),
+                          ],
                         ),
-                      ],
+                      ),
                     ),
 
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 20),
 
                     // ── Tarjeta donación de alimentos ──
                     Container(
@@ -183,80 +237,6 @@ class TipsScreen extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-// ── Tarjeta de tip de alimento ──
-class _FoodTipCard extends StatelessWidget {
-  final String title;
-  final String tipText;
-  final Color imagePlaceholderColor;
-  final IconData imagePlaceholderIcon;
-
-  const _FoodTipCard({
-    required this.title,
-    required this.tipText,
-    required this.imagePlaceholderColor,
-    required this.imagePlaceholderIcon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Título columna
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.bold,
-            color: AppColors.textDark,
-          ),
-          textAlign: TextAlign.center,
-        ),
-        const SizedBox(height: 8),
-
-        // Imagen (placeholder por ahora)
-        Container(
-          width: double.infinity,
-          height: 130,
-          decoration: BoxDecoration(
-            color: imagePlaceholderColor,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Icon(
-            imagePlaceholderIcon,
-            size: 48,
-            color: Colors.white.withValues(alpha: 0.8),
-          ),
-          // TODO: reemplaza con imagen real:
-          // child: ClipRRect(
-          //   borderRadius: BorderRadius.circular(16),
-          //   child: Image.asset('assets/images/xxx.jpg', fit: BoxFit.cover),
-          // ),
-        ),
-
-        const SizedBox(height: 10),
-
-        // Texto del tip
-        RichText(
-          text: TextSpan(
-            style: const TextStyle(fontSize: 13, color: AppColors.textDark),
-            children: [
-              const TextSpan(
-                text: 'Tips: ',
-                style: TextStyle(
-                  color: AppColors.textGreen,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              TextSpan(text: tipText),
-            ],
-          ),
-        ),
-      ],
     );
   }
 }

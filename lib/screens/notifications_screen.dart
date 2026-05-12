@@ -88,8 +88,14 @@ class _ExpiryList extends StatelessWidget {
       itemBuilder: (context, index) {
         final item = items[index];
         final daysLeft = item.expiresAt.difference(now).inDays;
+        final totalDays = item.expiresAt.difference(item.scannedAt).inDays;
         final isExpired = daysLeft < 0;
         final isUrgent = !isExpired && daysLeft <= 3;
+
+        // Progreso: 1.0 = recién escaneado, 0.0 = vencido
+        final progress = (totalDays > 0)
+            ? (daysLeft / totalDays).clamp(0.0, 1.0)
+            : 0.0;
 
         Color statusColor;
         String statusText;
@@ -97,7 +103,7 @@ class _ExpiryList extends StatelessWidget {
 
         if (isExpired) {
           statusColor = AppColors.red;
-          statusText = 'Vencido hace ${(-daysLeft)} día${daysLeft == -1 ? '' : 's'}';
+          statusText = 'Vencido hace ${(-daysLeft)} día${(-daysLeft) == 1 ? '' : 's'}';
           statusIcon = Icons.warning_amber_rounded;
         } else if (isUrgent) {
           statusColor = Colors.orange.shade600;
@@ -121,51 +127,110 @@ class _ExpiryList extends StatelessWidget {
               width: 1.5,
             ),
           ),
-          child: Row(
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Ícono de estado
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(alpha: 0.12),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(statusIcon, color: statusColor, size: 22),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.product.name,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: AppColors.textDark,
-                      ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Ícono de estado
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
                     ),
-                    const SizedBox(height: 4),
+                    child: Icon(statusIcon, color: statusColor, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.product.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          statusText,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: statusColor,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          'Vence: ${_formatDate(item.expiresAt)}',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textGrey,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Porcentaje restante
+                  if (!isExpired)
                     Text(
-                      statusText,
+                      '${(progress * 100).round()}%',
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.bold,
                         color: statusColor,
                       ),
                     ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'Vence: ${_formatDate(item.expiresAt)}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textGrey,
+                ],
+              ),
+
+              // ── Barra de progreso ──────────────────────────────────────────
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(4),
+                      child: Stack(
+                        children: [
+                          // Fondo de la barra
+                          Container(
+                            height: 7,
+                            color: statusColor.withValues(alpha: 0.15),
+                          ),
+                          // Relleno de la barra
+                          FractionallySizedBox(
+                            alignment: Alignment.centerLeft,
+                            widthFactor: isExpired ? 0.0 : progress,
+                            child: Container(
+                              height: 7,
+                              decoration: BoxDecoration(
+                                color: statusColor,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    isExpired
+                        ? 'Vencido'
+                        : '$daysLeft / $totalDays días',
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: statusColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
