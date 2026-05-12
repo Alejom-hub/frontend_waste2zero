@@ -26,6 +26,8 @@ class _HomeScreenState extends State<HomeScreen> {
     final XFile? photo = await _picker.pickImage(
       source: ImageSource.camera,
       preferredCameraDevice: CameraDevice.rear,
+      // imageQuality: 100 fuerza conversión HEIC→JPEG en iOS sin perder calidad
+      imageQuality: 100,
     );
     if (photo != null) {
       setState(() => _selectedImage = File(photo.path));
@@ -36,6 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _openGallery() async {
     final XFile? photo = await _picker.pickImage(
       source: ImageSource.gallery,
+      // imageQuality: 100 fuerza conversión HEIC→JPEG en iOS sin perder calidad
+      imageQuality: 100,
     );
     if (photo != null) {
       setState(() => _selectedImage = File(photo.path));
