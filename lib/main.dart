@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'screens/welcome_screen.dart';
+import 'screens/splash_screen.dart';
 import 'services/notification_service.dart';
 import 'theme/app_colors.dart';
 
@@ -38,7 +38,7 @@ class Waste2ZeroApp extends StatelessWidget {
           foregroundColor: AppColors.textDark,
         ),
       ),
-      home: const WelcomeScreen(),
+      home: const SplashScreen(),
     );
   }
 }
